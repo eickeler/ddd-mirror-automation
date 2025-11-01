@@ -42,6 +42,7 @@ jobs:
           make
           ddd/ddd --help
 
+
       - name: Create source tarball
 
         working-directory: ddd
@@ -53,7 +54,6 @@ jobs:
           ls -l ..
 
 
-      - uses: actions/checkout@v4
       - name: Publish nightly release (in this repo)
 
         env:
