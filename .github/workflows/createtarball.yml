@@ -34,12 +34,12 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y \
             build-essential autoconf automake libtool make \
-            libmotif-dev texinfo flex bison libtinyxml2-dev \
+            libmotif-dev texinfo flex bison libtinyxml2-dev libxpm-dev \
             libfreetype-dev libxft-dev libfontconfig-dev libncurses-dev \
             gawk gdb fonts-liberation fig2dev texlive 
           autoreconf -ifv
           ./configure
-          #make
+          make
 
       - name: Create source tarball
 
@@ -55,8 +55,9 @@ jobs:
 
         env:
           GH_TOKEN: ${{ github.token }}
+          OWNER_REPO: ${{ github.repository }}  # e.g., eickeler/ddd-mirror-automation
         run: |
           TAG="nightly-${DATE}"
-          gh release create "$TAG" --title "DDD Nightly $DATE" --prerelease --target "$COMMIT" || \
-          gh release edit "$TAG" --title "DDD Nightly $DATE" --prerelease
-          gh release upload "$TAG" "ddd-nightly-${DATE}.tar.gz" --clobber
+          gh release create "$TAG" --repo "$OWNER_REPO" --title "DDD Nightly $DATE" --prerelease --target "$COMMIT" || \
+          gh release edit "$TAG" --repo "$OWNER_REPO" --title "DDD Nightly $DATE" --prerelease
+          gh release upload "$TAG" --repo "$OWNER_REPO" "ddd-nightly-${DATE}.tar.gz" --clobber
