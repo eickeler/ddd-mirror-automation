@@ -1,4 +1,4 @@
-name: Nightly source tarball (DDD)
+name: DDD Nightly source tarball
 
 on:
   workflow_run:
@@ -51,6 +51,7 @@ jobs:
           mv "$TARBALL" "../ddd-nightly-${DATE}.tar.gz"
 
 
+      - uses: actions/checkout@v4
       - name: Publish nightly release (in this repo)
 
         env:
@@ -58,6 +59,7 @@ jobs:
           OWNER_REPO: ${{ github.repository }}  # e.g., eickeler/ddd-mirror-automation
         run: |
           TAG="nightly-${DATE}"
-          gh release create "$TAG" --repo "$OWNER_REPO" --title "DDD Nightly $DATE" --prerelease --target "$COMMIT" || \
+          # Create/edit release pointing to this repo’s current commit (or omit --target)
+          gh release create "$TAG" --repo "$OWNER_REPO" --title "DDD Nightly $DATE" --prerelease --target "$GITHUB_SHA" || \
           gh release edit "$TAG" --repo "$OWNER_REPO" --title "DDD Nightly $DATE" --prerelease
           gh release upload "$TAG" --repo "$OWNER_REPO" "ddd-nightly-${DATE}.tar.gz" --clobber
