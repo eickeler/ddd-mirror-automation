@@ -39,7 +39,7 @@ jobs:
             gawk gdb fonts-liberation fig2dev texlive 
           autoreconf -ifv
           ./configure
-          make
+          #make
 
       - name: Create source tarball
 
