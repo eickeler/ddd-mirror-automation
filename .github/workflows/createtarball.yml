@@ -36,7 +36,7 @@ jobs:
             build-essential autoconf automake libtool make \
             libmotif-dev texinfo flex bison libtinyxml2-dev \
             libfreetype-dev libxft-dev libfontconfig-dev libncurses-dev \
-            gawk gdb fonts-liberation fig2dev
+            gawk gdb fonts-liberation fig2dev texlive 
           autoreconf -ifv
           ./configure
           make
