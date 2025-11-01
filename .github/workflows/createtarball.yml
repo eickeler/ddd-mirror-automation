@@ -1,0 +1,57 @@
+name: Nightly source tarball (DDD)
+
+on:
+  workflow_run:
+    workflows: ["Mirror DDD to GitHub"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  nightly:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      MIRROR_REPO: https://github.com/eickeler/ddd.git
+
+    steps:
+
+      - name: Checkout latest master
+
+        run: |
+          git clone --depth 1 --branch master "$MIRROR_REPO" ddd
+          cd ddd
+          echo "COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
+
+
+      - name: Build binaries
+
+        working-directory: ddd
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential autoconf make libmotif-dev texinfo flex bison \ 
+              netpbm libfreetype-dev libxft-dev libfontconfig-dev libncurses-dev gawk libtool automake \
+              info gdb fonts-liberation fig2dev texinfo
+          autoreconf -ifv
+          ./configure
+          make 
+
+      - name: Create source tarball
+
+        working-directory: ddd
+        run: |
+          make dist
+
+
+      - name: Publish nightly release (in this repo)
+
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="nightly-${DATE}"
+          gh release create "$TAG" --title "DDD Nightly $DATE" --prerelease --target "$COMMIT" || \
+          gh release edit "$TAG" --title "DDD Nightly $DATE" --prerelease
+          gh release upload "$TAG" "ddd-nightly-${DATE}.tar.gz" --clobber
