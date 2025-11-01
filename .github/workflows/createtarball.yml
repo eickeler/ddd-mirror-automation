@@ -46,9 +46,13 @@ jobs:
         working-directory: ddd
         run: |
           make dist
+          ls -l
           # Rename/move to repo root with nightly name
           TARBALL=$(ls ddd-*.tar.gz | head -n1)
           mv "$TARBALL" "../ddd-nightly-${DATE}.tar.gz"
+          ls -l ..
+          echo "$TARBALL"
+          echo "${DATE}"
 
 
       - uses: actions/checkout@v4
