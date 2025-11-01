@@ -40,6 +40,7 @@ jobs:
           autoreconf -ifv
           ./configure
           make
+          ddd/ddd --help
 
       - name: Create source tarball
 
