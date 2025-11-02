@@ -43,7 +43,7 @@ jobs:
           fi
 
 
-      - name: No mirroring needed
+      - name: Output result
 
         if: steps.check.outputs.changed == 'false'
         run: |
