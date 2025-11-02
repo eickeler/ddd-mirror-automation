@@ -24,13 +24,40 @@ jobs:
           git config --global fetch.prune true
 
 
-      - name: Clone upstream as mirror
+      - name: Check for changes (no clone)
 
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          upstream_refs="$(git ls-remote --heads --tags "$UPSTREAM" | sort)"
+          target_refs="$(git ls-remote --heads --tags "https://github.com/${TARGET}.git" | sort || true)"
+          if [ "$upstream_refs" = "$target_refs" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected; skipping mirror."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected; will mirror."
+          fi
+
+
+      - name: No mirroring needed
+
+        if: steps.check.outputs.changed == 'false'
+        run: |
+          echo "No mirroring needed: upstream and GitHub refs are identical."
+          echo "No mirroring needed: upstream and GitHub refs are identical." >> "$GITHUB_STEP_SUMMARY"
+
+
+      - name: Clone upstream as mirror
+      
+        if: steps.check.outputs.changed == 'true'
         run: git clone --mirror "$UPSTREAM" upstream.git
 
 
       - name: Push to GitHub mirror
 
+        if: steps.check.outputs.changed == 'true'
         working-directory: upstream.git
         env:
           PAT: ${{ secrets.MIRROR_PUSH_TOKEN }}   # fine-grained PAT
