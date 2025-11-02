@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   nightly:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       MIRROR_REPO: https://github.com/eickeler/DDD.git
