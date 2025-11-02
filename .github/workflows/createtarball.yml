@@ -1,9 +1,7 @@
 name: DDD Nightly source tarball
 
 on:
-  workflow_run:
-    workflows: ["Mirror DDD to GitHub"]
-    types: [completed]
+  workflow_call:
   workflow_dispatch:
 
 
