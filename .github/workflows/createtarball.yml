@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
-      MIRROR_REPO: https://github.com/eickeler/ddd.git
+      MIRROR_REPO: https://github.com/eickeler/DDD.git
     steps:
 
       - name: Checkout latest master
