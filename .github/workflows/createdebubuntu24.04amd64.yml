@@ -1,0 +1,112 @@
+name: Create nightly .deb package for Ubuntu 24.04
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  nightly:
+    runs-on: ubuntu-24.04
+    env:
+      MIRROR_REPO: https://github.com/eickeler/DDD.git
+    steps:
+
+
+      - name: Checkout latest master
+
+        run: |
+          git clone --depth 1 --branch master "$MIRROR_REPO" ddd
+          cd ddd
+          echo "COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
+          echo "VERSION=3.3.12+git${DATE}" >> $GITHUB_ENV
+
+
+
+      - name: Install build dependencies
+
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            build-essential autoconf automake libtool make libxpm-dev \
+            libmotif-dev texinfo flex bison libtinyxml2-dev libxext-dev \
+            libfreetype-dev libxft-dev libfontconfig-dev libncurses-dev \
+            gawk gdb fonts-liberation fig2dev texlive \
+            debhelper devscripts dh-make
+
+
+
+      - name: Build binaries
+
+        working-directory: ddd
+        run: |
+          autoreconf -ifv
+          ./configure --prefix=/usr
+          make
+
+
+
+      - name: Create debian package structure
+
+        working-directory: ddd
+        run: |
+          mkdir -p debian/ddd/DEBIAN
+          mkdir -p debian/ddd/usr
+          
+          # Install to staging directory
+          make install DESTDIR=$(pwd)/debian/ddd
+          
+          # Create control file
+          cat > debian/ddd/DEBIAN/control <<EOF
+          Package: ddd
+          Version: ${VERSION}
+          Section: devel
+          Priority: optional
+          Architecture: amd64
+          Depends: libxpm4, libmotif-common, libxt6, libxext6, libfreetype6, libxft2, libfontconfig1, libncurses6, 
+            libtinyxml2-10, libx11-6, libtinfo6, libtinyxml2-10, libstdc++6, libxmu6, libjpeg-turbo8, libpng16-16,
+            libsm6, libice6, libxcb1, libfreetype6, libxrender1, libexpat1, zlib1g, libuuid1, libbsd0, libxau6, 
+            libxdmcp6, libbz2-1.0, libbrotli1, libmd0, xterm, gnuplot
+          Maintainer: DDD Maintainers (Michael Eager & Stefan Eickeler) <ddd@gnu.org>
+          Description: Data Display Debugger - graphical debugger frontend
+           DDD is a graphical front-end for command-line debuggers such as GDB,
+           DBX, WDB, Ladebug, JDB, XDB, the Perl debugger, the bash debugger,
+           or the Python debugger. Besides usual front-end features such as
+           viewing source texts, DDD has become famous through its interactive
+           graphical data display, where data structures are displayed as graphs.
+          EOF
+          
+          # Build the .deb package
+          dpkg-deb --build debian/ddd
+          mv debian/ddd.deb "../ddd-nightly-${DATE}_${VERSION}_amd64.deb"
+
+
+
+      - name: Test package
+
+        run: |
+          sudo dpkg -i "ddd-nightly-${DATE}_${VERSION}_amd64.deb" || true
+          sudo apt-get install -f -y
+          ddd --help
+
+
+
+      - name: Publish nightly release
+
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER_REPO: ${{ github.repository }}
+        run: |
+          TAG="nightly-${DATE}"
+          gh release create "$TAG" --repo "$OWNER_REPO" \
+            --title "DDD Nightly $DATE" \
+            --notes "Nightly .deb package for Ubuntu 24.04 (amd64)" \
+            --prerelease --target "$GITHUB_SHA" || \
+          gh release edit "$TAG" --repo "$OWNER_REPO" \
+            --title "DDD Nightly $DATE" --prerelease
+          
+          gh release upload "$TAG" --repo "$OWNER_REPO" \
+            "ddd-nightly-${DATE}_${VERSION}_amd64.deb" --clobber
