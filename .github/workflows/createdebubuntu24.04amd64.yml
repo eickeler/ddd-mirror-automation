@@ -22,7 +22,7 @@ jobs:
           cd ddd
           echo "COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
           echo "DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
-          echo "VERSION=3.4.1+git${DATE}" >> $GITHUB_ENV
+          echo "VERSION=trunk+git${DATE}" >> $GITHUB_ENV
 
 
 
