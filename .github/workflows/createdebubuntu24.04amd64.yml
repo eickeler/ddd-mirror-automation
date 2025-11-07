@@ -58,6 +58,9 @@ jobs:
           
           # Install to staging directory
           make install DESTDIR=$(pwd)/debian/ddd
+
+          # Remove version number from install directory
+          mv $(DESTDIR)/usr/local/share/ddd-* /usr/local/share/ddd
           
           # Create control file
           cat > debian/ddd/DEBIAN/control <<EOF
