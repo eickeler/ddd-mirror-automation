@@ -35,7 +35,7 @@ jobs:
             libmotif-dev texinfo flex bison libtinyxml2-dev libxext-dev \
             libfreetype-dev libxft-dev libfontconfig-dev libncurses-dev \
             gawk gdb fonts-liberation fig2dev texlive \
-            debhelper devscripts dh-make
+            debhelper devscripts dh-make gzip
 
 
 
@@ -61,6 +61,9 @@ jobs:
 
           # Remove version number from install directory
           mv debian/ddd/usr/share/ddd-* debian/ddd/usr/share/ddd
+
+          # gzip .info files
+          gzip debian/ddd/usr/share/ddd/info/ddd*info*
           
           # Create control file
           cat > debian/ddd/DEBIAN/control <<EOF
