@@ -15,7 +15,7 @@ DDD is a graphical front-end for command-line debuggers like GDB.
 - Upstream source (Savannah): https://git.savannah.gnu.org/git/ddd.git
 
 - GitHub mirror (read-only copy): https://github.com/eickeler/ddd
-- Nightly tarballs (Releases on this repo): https://github.com/eickeler/ddd-mirror-automation/releases
+- Nightly tarballs (Releases on this repo): https://github.com/eickeler/DDD-workflows/releases
 
 ## What this is
 
@@ -32,13 +32,11 @@ DDD is a graphical front-end for command-line debuggers like GDB.
   - GitHub mirror: https://github.com/eickeler/DDD (default branch: `master`)
 
 - Download nightly source:
-  - Go to Releases on this repo: https://github.com/eickeler/ddd-mirror-automation/releases
-
+  - Go to Releases on this repo: https://github.com/eickeler/DDD-workflows/releases
   - Pick the latest “Nightly” and download the `.tar.gz` asset.
+    
 - Report bugs or propose changes:
-
   - Please use the official channels linked from the DDD homepage:
-
     https://savannah.gnu.org/projects/ddd/
 
 ## Notes
